@@ -5,6 +5,12 @@ import hudson.plugins.git.extensions.*
 import hudson.plugins.git.extensions.impl.*
 import jenkins.model.Jenkins
 
+def call(body){
+def config = [:]
+body.resolveStrategy = Closure.DELEGATE_FIRST
+body.delegate = config
+body()
+
 // parameters
 def jobParameters = [
   name:          'MyJob',
