@@ -10,6 +10,7 @@ def config = [:]
 foo.resolveStrategy = Closure.DELEGATE_FIRST
 foo.delegate = config
 foo()
+}
 
 // parameters
 def jobParameters = [
@@ -51,4 +52,4 @@ job.setDescription(jobParameters.description)
 jenkins.save()
 jenkins.reload()
   
-} 
+
