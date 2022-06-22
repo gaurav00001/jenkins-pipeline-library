@@ -5,12 +5,6 @@ import hudson.plugins.git.extensions.*
 import hudson.plugins.git.extensions.impl.*
 import jenkins.model.Jenkins
 
-def call(foo){ 
-def config = [:]
-foo.resolveStrategy = Closure.DELEGATE_FIRST
-foo.delegate = config
-foo()
-}
 
 // parameters
 def jobParameters = [
