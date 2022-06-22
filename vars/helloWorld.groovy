@@ -1,54 +1,13 @@
-#!groovy
-// imports
-import hudson.plugins.git.*
-import hudson.plugins.git.extensions.*
-import hudson.plugins.git.extensions.impl.*
-import jenkins.model.Jenkins
+import jenkins.model.Jenkins;
+import hudson.model.FreeStyleProject;
+import hudson.tasks.Shell;
 
-def call(body){ 
-def config = [:]
-body.resolveStrategy = Closure.DELEGATE_FIRST
-body.delegate = config
-body()
+job = Jenkins.instance.createProject(FreeStyleProject, 'job-name')
 
-// parameters
-def jobParameters = [
-  name:          'MyJob',
-  description:   'Build of my STG environment : https://stg.mycompany.com',
-  repository:    'git@github.com:my-company/my-repo.git',
-  branch:        'master',
-  credentialId:  'jenkins-key'
-]
+job.buildersList.add(new Shell('echo hello world'))
 
-// define repo configuration
-def branchConfig                =   [new BranchSpec(jobParameters.branch)]
-def userConfig                  =   [new UserRemoteConfig(jobParameters.repository, null, null, jobParameters.credentialId)]
-def cleanBeforeCheckOutConfig   =   new CleanBeforeCheckout()
-def sparseCheckoutPathConfig    =   new SparseCheckoutPaths([new SparseCheckoutPath("Jenkinsfile")])
-def cloneConfig                 =   new CloneOption(true, true, null, 3)
-def extensionsConfig            =   [cleanBeforeCheckOutConfig,sparseCheckoutPathConfig,cloneConfig]
-def scm                         =   new GitSCM(userConfig, branchConfig, false, [], null, null, extensionsConfig)
+job.save()
 
-// define SCM flow
-def flowDefinition = new org.jenkinsci.plugins.workflow.cps.CpsScmFlowDefinition(scm, "Jenkinsfile")
+build = job.scheduleBuild2(5, new hudson.model.Cause.UserIdCause())
 
-// set lightweight checkout
-flowDefinition.setLightweight(true)
-
-// get Jenkins instance
-Jenkins jenkins = Jenkins.getInstance()
-
-// create the job
-def job = new org.jenkinsci.plugins.workflow.job.WorkflowJob(jenkins,jobParameters.name)
-
-// define job type
-job.definition = flowDefinition
-
-// set job description
-job.setDescription(jobParameters.description)
-
-// save to disk
-jenkins.save()
-jenkins.reload()
-  
-} 
+build.get()
